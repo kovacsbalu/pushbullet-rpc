@@ -5,7 +5,7 @@ import pushbullet
 API_CHECK_FREQUENCY = 5
 
 
-class PushBulletRPC(object):
+class PushbulletRPC(object):
 
     def __init__(self, api_key, srv_dev_name):
         self.pb = pushbullet.PushBullet(api_key)
@@ -27,7 +27,7 @@ class PushBulletRPC(object):
         while True:
             for push in self.get_my_active_pushes(self.last_check):
                 source_device = self.find_device_by_iden(push["source_device_iden"])
-                func_name, params = PushBulletRPC.parse_call(push)
+                func_name, params = PushbulletRPC.parse_call(push)
                 print "Push back to %s" % source_device.nickname
                 if func_name:
                     title, body = self.process_push(func_name, params)
