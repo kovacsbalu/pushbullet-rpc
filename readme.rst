@@ -26,4 +26,5 @@ Check example.py
 Tests
 -----
 ::
-    $ py.test tests.py
+
+    py.test tests.py
