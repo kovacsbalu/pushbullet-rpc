@@ -1,14 +1,18 @@
+import json
 import time
 
 import pushbullet
+import websocket
 
 API_CHECK_FREQUENCY = 5
+PB_WS_URL = "wss://stream.pushbullet.com/websocket/"
 
 
 class PushbulletRPC(object):
 
     def __init__(self, api_key, srv_dev_name):
         self.pb = pushbullet.PushBullet(api_key)
+        self.pb_ws = websocket.create_connection(PB_WS_URL + api_key)
         self.srv = self.get_srv_device(srv_dev_name)
         self.last_check = time.time()
         self.funcs = {}
@@ -25,16 +29,23 @@ class PushbulletRPC(object):
 
     def start(self):
         while True:
-            for push in self.get_my_active_pushes(self.last_check):
-                source_device = self.find_device_by_iden(push["source_device_iden"])
-                func_name, params = PushbulletRPC.parse_call(push)
-                print "Push back to %s" % source_device.nickname
-                if func_name:
-                    title, body = self.process_push(func_name, params)
-                else:
-                    title, body = "Error", "empty function name"
-                self.pb.push_note(title, body, device=source_device)
-            time.sleep(API_CHECK_FREQUENCY)
+            if self.socket_has_push():
+                for push in self.get_my_active_pushes(self.last_check):
+                    source_device = self.find_device_by_iden(push["source_device_iden"])
+                    func_name, params = PushbulletRPC.parse_call(push)
+                    print "Push back to %s" % source_device.nickname
+                    if func_name:
+                        title, body = self.process_push(func_name, params)
+                    else:
+                        title, body = "Error", "empty function name"
+                    self.pb.push_note(title, body, device=source_device)
+
+    def socket_has_push(self):
+        json_data = self.pb_ws.recv()
+        data = json.loads(json_data)
+        if data.get("type") == "tickle" and data.get("subtype") == "push":
+            return True
+        return False
 
     def find_device_by_name(self, name):
         for dev in self.pb.devices:

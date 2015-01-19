@@ -1,3 +1,4 @@
+import json
 import time
 import mock
 import pytest
@@ -23,6 +24,7 @@ class TestPushbulletRPC(object):
     @classmethod
     def setup_class(cls):
         pushbulletrpc.pushbullet.PushBullet = FakePushBullet
+        pushbulletrpc.websocket = mock.Mock(return_value=None)
 
     def test_init(self):
         pb_rpc = pushbulletrpc.PushbulletRPC("test api key", "test_dev")
@@ -138,3 +140,15 @@ class TestPushbulletRPC(object):
         pb_rpc = pushbulletrpc.PushbulletRPC("test api key", "test_dev")
         result = pb_rpc.process_push("test_func")
         assert result == ('Error', 'method test_func is not supported')
+
+    def test_socket_has_push(self):
+        pb_rpc = pushbulletrpc.PushbulletRPC("test api key", "test_dev")
+        data = {"type": "tickle", "subtype": "push"}
+        pb_rpc.pb_ws.recv = mock.Mock(return_value=json.dumps(data))
+        assert pb_rpc.socket_has_push()
+
+    def test_socket_has_no_push(self):
+        pb_rpc = pushbulletrpc.PushbulletRPC("test api key", "test_dev")
+        data = {"type": "nop"}
+        pb_rpc.pb_ws.recv = mock.Mock(return_value=json.dumps(data))
+        assert not pb_rpc.socket_has_push()
