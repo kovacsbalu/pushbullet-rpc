@@ -16,7 +16,7 @@ Installation
 Requirements
 ------------
 
--  pushbullet.py (https://github.com/randomchars/pushbullet.py)
+-  pushbullet.py **v0.7.1** (https://github.com/randomchars/pushbullet.py)
 
 Usage
 -----
