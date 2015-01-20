@@ -17,6 +17,29 @@ class PushbulletRPC(object):
         self.last_check = time.time()
         self.funcs = {}
 
+    def start(self):
+        while True:
+            self.listen_and_process()
+
+    def listen_and_process(self):
+        if self.socket_has_push():
+            for push in self.get_my_active_pushes(self.last_check):
+                source_device = self.find_device_by_iden(push["source_device_iden"])
+                func_name, params = PushbulletRPC.parse_call(push)
+                print "Push back to %s" % source_device.nickname
+                if func_name:
+                    title, body = self.process_push(func_name, params)
+                else:
+                    title, body = "Error", "empty function name"
+                self.pb.push_note(title, body, device=source_device)
+
+    def socket_has_push(self):
+        json_data = self.pb_ws.recv()
+        data = json.loads(json_data)
+        if data.get("type") == "tickle" and data.get("subtype") == "push":
+            return True
+        return False
+
     def get_srv_device(self, srv_dev_name):
         dev = self.find_device_by_name(srv_dev_name)
         if dev:
@@ -26,26 +49,6 @@ class PushbulletRPC(object):
         if success:
             return dev
         raise RuntimeError("Error while creating new device.")
-
-    def start(self):
-        while True:
-            if self.socket_has_push():
-                for push in self.get_my_active_pushes(self.last_check):
-                    source_device = self.find_device_by_iden(push["source_device_iden"])
-                    func_name, params = PushbulletRPC.parse_call(push)
-                    print "Push back to %s" % source_device.nickname
-                    if func_name:
-                        title, body = self.process_push(func_name, params)
-                    else:
-                        title, body = "Error", "empty function name"
-                    self.pb.push_note(title, body, device=source_device)
-
-    def socket_has_push(self):
-        json_data = self.pb_ws.recv()
-        data = json.loads(json_data)
-        if data.get("type") == "tickle" and data.get("subtype") == "push":
-            return True
-        return False
 
     def find_device_by_name(self, name):
         for dev in self.pb.devices:
