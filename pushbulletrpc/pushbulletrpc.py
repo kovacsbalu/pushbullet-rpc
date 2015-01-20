@@ -19,9 +19,9 @@ class PushbulletRPC(object):
 
     def start(self):
         while True:
-            self.listen_and_process()
+            self.recv_and_process()
 
-    def listen_and_process(self):
+    def recv_and_process(self):
         if self.socket_has_push():
             for push in self.get_my_active_pushes(self.last_check):
                 source_device = self.find_device_by_iden(push["source_device_iden"])
@@ -36,9 +36,7 @@ class PushbulletRPC(object):
     def socket_has_push(self):
         json_data = self.pb_ws.recv()
         data = json.loads(json_data)
-        if data.get("type") == "tickle" and data.get("subtype") == "push":
-            return True
-        return False
+        return (data.get("type") == "tickle" and data.get("subtype") == "push")
 
     def get_srv_device(self, srv_dev_name):
         dev = self.find_device_by_name(srv_dev_name)

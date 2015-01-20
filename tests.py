@@ -48,7 +48,7 @@ class TestPushbulletRPC(object):
             self.pb_rpc.get_srv_device("test_dev")
         assert excinfo.value.message == "Error while creating new device."
 
-    def test_listen_and_process(self):
+    def test_recv_and_process(self):
         self.pb_rpc.socket_has_push = mock.Mock(return_value=True)
         test_pushes = [{"target_device_iden": "test_dev_iden", "active": True, "source_device_iden": "s_iden"}]
         self.pb_rpc.get_my_active_pushes = mock.Mock(return_value=test_pushes)
@@ -59,12 +59,12 @@ class TestPushbulletRPC(object):
         with mock.patch.object(pushbulletrpc.PushbulletRPC, 'parse_call', return_value=(testfunc, testparams)) as mock_parse_call:
             title, body = "result title", "result body"
             self.pb_rpc.process_push = mock.Mock(return_value=(title, body))
-            self.pb_rpc.listen_and_process()
+            self.pb_rpc.recv_and_process()
             mock_parse_call.assert_called_with(test_pushes[0])
             self.pb_rpc.process_push.assert_called_with(testfunc, testparams)
             self.pb_rpc.pb.push_note.assert_called_once_with(title, body, device=test_source_dev)
 
-    def test_listen_and_process_error(self):
+    def test_recv_and_process_error(self):
         self.pb_rpc.socket_has_push = mock.Mock(return_value=True)
         test_pushes = [{"target_device_iden": "test_dev_iden", "active": True, "source_device_iden": "s_iden"}]
         self.pb_rpc.get_my_active_pushes = mock.Mock(return_value=test_pushes)
@@ -72,7 +72,7 @@ class TestPushbulletRPC(object):
         self.pb_rpc.find_device_by_iden = mock.Mock(return_value=test_source_dev)
         self.pb_rpc.pb.push_note = mock.Mock()
         with mock.patch.object(pushbulletrpc.PushbulletRPC, 'parse_call', return_value=("", "")) as mock_parse_call:
-            self.pb_rpc.listen_and_process()
+            self.pb_rpc.recv_and_process()
             mock_parse_call.assert_called_with(test_pushes[0])
             self.pb_rpc.pb.push_note.assert_called_once_with('Error', 'empty function name', device=test_source_dev)
 
