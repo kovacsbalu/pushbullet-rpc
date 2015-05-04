@@ -13,7 +13,7 @@ class Device(object):
         self.device_iden = iden
 
 
-class FakePushBullet(object):
+class FakePushbullet(object):
 
     def __init__(self, api_key=None):
         self.devices = [Device("test_dev")]
@@ -22,7 +22,7 @@ class FakePushBullet(object):
 class TestPushbulletRPC(object):
 
     def setup_method(self, method):
-        pushbulletrpc.pushbullet.PushBullet = FakePushBullet
+        pushbulletrpc.pushbullet.Pushbullet = FakePushbullet
         pushbulletrpc.websocket = mock.Mock(return_value=None)
         self.pb_rpc = pushbulletrpc.PushbulletRPC("test api key", "test_dev")
 

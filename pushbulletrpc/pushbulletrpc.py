@@ -11,7 +11,7 @@ PB_WS_URL = "wss://stream.pushbullet.com/websocket/"
 class PushbulletRPC(object):
 
     def __init__(self, api_key, srv_dev_name):
-        self.pb = pushbullet.PushBullet(api_key)
+        self.pb = pushbullet.Pushbullet(api_key)
         self.pb_ws = websocket.create_connection(PB_WS_URL + api_key)
         self.srv = self.get_srv_device(srv_dev_name)
         self.last_check = time.time()
