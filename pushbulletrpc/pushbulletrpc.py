@@ -26,7 +26,7 @@ class PushbulletRPC(object):
             for push in self.get_my_active_pushes(self.last_check):
                 source_device = self.find_device_by_iden(push["source_device_iden"])
                 func_name, params = PushbulletRPC.parse_call(push)
-                print "Push back to %s" % source_device.nickname
+                print "Push back to %s." % source_device.nickname
                 if func_name:
                     title, body = self.process_push(func_name, params)
                 else:
@@ -36,16 +36,16 @@ class PushbulletRPC(object):
     def socket_has_push(self):
         json_data = self.pb_ws.recv()
         data = json.loads(json_data)
-        return (data.get("type") == "tickle" and data.get("subtype") == "push")
+        return data.get("type") == "tickle" and data.get("subtype") == "push"
 
     def get_srv_device(self, srv_dev_name):
         dev = self.find_device_by_name(srv_dev_name)
         if dev:
             return dev
-        print "Device not found. Creating ..."
+        print "%s device not found. Creating." % srv_dev_name
         try:
             return self.pb.new_device(srv_dev_name)
-        except pushbullet.PushbulletError: 
+        except pushbullet.PushbulletError:
             raise RuntimeError("Error while creating new device.")
 
     def find_device_by_name(self, name):

@@ -94,41 +94,34 @@ class TestPushbulletRPC(object):
     def test_find_device_by_name(self):
         test_dev = Device("dev_name")
         self.pb_rpc.pb.devices = [test_dev]
-        dev = self.pb_rpc.find_device_by_name("dev_name")
-        assert dev == test_dev
+        assert self.pb_rpc.find_device_by_name("dev_name") == test_dev
 
     def test_find_device_by_iden(self):
         test_dev = Device("test_dev", "dev_iden")
         self.pb_rpc.pb.devices = [test_dev]
-        dev = self.pb_rpc.find_device_by_iden("dev_iden")
-        assert dev == test_dev
+        assert self.pb_rpc.find_device_by_iden("dev_iden") == test_dev
 
     def test_get_my_active_pushes(self):
         self.pb_rpc.srv = Device("dev_name", "test_dev_iden")
         test_pushes = [{"target_device_iden": "test_dev_iden", "active": True}]
         self.pb_rpc.pb.get_pushes = mock.Mock(return_value=(True, test_pushes))
-        active_pushes = self.pb_rpc.get_my_active_pushes(time.time(), limit=None)
-        assert active_pushes == test_pushes
+        assert self.pb_rpc.get_my_active_pushes(time.time(), limit=None) == test_pushes
 
     def test_get_my_active_pushes_no_pushes_for_device(self):
         self.pb_rpc.srv = Device("dev_name", "no_dev_iden")
         test_pushes = [{"target_device_iden": "test_dev_iden", "active": True}]
         self.pb_rpc.pb.get_pushes = mock.Mock(return_value=(True, test_pushes))
-        active_pushes = self.pb_rpc.get_my_active_pushes(time.time(), limit=None)
-        assert active_pushes != test_pushes
+        assert self.pb_rpc.get_my_active_pushes(time.time(), limit=None) != test_pushes
 
     def test_get_my_active_pushes_no_pushes(self):
         self.pb_rpc.srv = Device("dev_name", "test_dev_iden")
         test_pushes = []
         self.pb_rpc.pb.get_pushes = mock.Mock(return_value=(True, test_pushes))
-        active_pushes = self.pb_rpc.get_my_active_pushes(time.time(), limit=None)
-        assert active_pushes == test_pushes
+        assert self.pb_rpc.get_my_active_pushes(time.time(), limit=None) == test_pushes
 
     def test_parse_call(self):
         test_push = {"title": "Func_Name ", "body": "Func_Params "}
-        func_name, params = self.pb_rpc.parse_call(test_push)
-        assert func_name == "func_name"
-        assert params == "func_params"
+        assert self.pb_rpc.parse_call(test_push) == ("func_name", "func_params")
 
     def test_register_function(self):
         def test_func():
@@ -140,30 +133,25 @@ class TestPushbulletRPC(object):
         def test_func():
             return "test_ok"
         self.pb_rpc.register_function(test_func)
-        result = self.pb_rpc.process_push("test_func")
-        assert result == "test_ok"
+        assert self.pb_rpc.process_push("test_func") == "test_ok"
 
     def test_process_push_args_error(self):
         def test_func():
             return "test_ok"
         self.pb_rpc.register_function(test_func)
-        result = self.pb_rpc.process_push("test_func", "args")
-        assert result == ("Error", "TypeError: test_func() takes no arguments (1 given)")
+        assert self.pb_rpc.process_push("test_func", "args") == ("Error", "TypeError: test_func() takes no arguments (1 given)")
 
     def test_process_push_with_args(self):
         def test_func(args):
             return "test_args_ok: %s" % args
         self.pb_rpc.register_function(test_func)
-        result = self.pb_rpc.process_push("test_func", "test_args")
-        assert result == "test_args_ok: test_args"
+        assert self.pb_rpc.process_push("test_func", "test_args") == "test_args_ok: test_args"
 
     def test_process_push_with_args_error(self):
         def test_func(args):
             return "test_args_ok"
         self.pb_rpc.register_function(test_func)
-        result = self.pb_rpc.process_push("test_func")
-        assert result == ("Error", "TypeError: test_func() takes exactly 1 argument (0 given)")
+        assert self.pb_rpc.process_push("test_func") == ("Error", "TypeError: test_func() takes exactly 1 argument (0 given)")
 
     def test_process_push_not_supported(self):
-        result = self.pb_rpc.process_push("test_func")
-        assert result == ('Error', 'method test_func is not supported')
+        assert self.pb_rpc.process_push("test_func") == ('Error', 'method test_func is not supported')
