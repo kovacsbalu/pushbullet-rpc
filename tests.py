@@ -6,6 +6,10 @@ import pytest
 from pushbulletrpc import pushbulletrpc
 
 
+class PushbulletError(Exception):
+    pass
+
+
 class Device(object):
 
     def __init__(self, name, iden=None):
@@ -23,6 +27,7 @@ class TestPushbulletRPC(object):
 
     def setup_method(self, method):
         pushbulletrpc.pushbullet.Pushbullet = FakePushbullet
+        pushbulletrpc.pushbullet.PushbulletError = PushbulletError
         pushbulletrpc.websocket = mock.Mock(return_value=None)
         self.pb_rpc = pushbulletrpc.PushbulletRPC("test api key", "test_dev")
 
@@ -37,13 +42,13 @@ class TestPushbulletRPC(object):
 
     def test_get_srv_device_create(self):
         self.pb_rpc.find_device_by_name = mock.Mock(return_value=None)
-        self.pb_rpc.pb.new_device = mock.Mock(return_value=(True, Device("new_dev")))
+        self.pb_rpc.pb.new_device = mock.Mock(return_value=(Device("new_dev")))
         dev = self.pb_rpc.get_srv_device("test_dev")
         assert dev.nickname == "new_dev"
 
     def test_get_srv_device_error(self):
         self.pb_rpc.find_device_by_name = mock.Mock(return_value=None)
-        self.pb_rpc.pb.new_device = mock.Mock(return_value=(False, None))
+        self.pb_rpc.pb.new_device = mock.Mock(return_value=(None), side_effect=pushbulletrpc.pushbullet.PushbulletError)
         with pytest.raises(RuntimeError) as excinfo:
             self.pb_rpc.get_srv_device("test_dev")
         assert excinfo.value.message == "Error while creating new device."

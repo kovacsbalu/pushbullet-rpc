@@ -17,7 +17,7 @@ Requirements
 ------------
 
 -  python **2.7.x**
--  pushbullet.py **v0.7.1** (https://github.com/randomchars/pushbullet.py)
+-  pushbullet.py **v0.8.1** (https://github.com/randomchars/pushbullet.py)
 -  python built in json
 -  websocket **v0.23.0** (https://github.com/liris/websocket-client)
 

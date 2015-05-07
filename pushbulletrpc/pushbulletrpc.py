@@ -43,10 +43,10 @@ class PushbulletRPC(object):
         if dev:
             return dev
         print "Device not found. Creating ..."
-        success, dev = self.pb.new_device(srv_dev_name)
-        if success:
-            return dev
-        raise RuntimeError("Error while creating new device.")
+        try:
+            return self.pb.new_device(srv_dev_name)
+        except pushbullet.PushbulletError: 
+            raise RuntimeError("Error while creating new device.")
 
     def find_device_by_name(self, name):
         for dev in self.pb.devices:

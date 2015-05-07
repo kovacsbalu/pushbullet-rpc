@@ -12,7 +12,7 @@ def upper(data):
 if __name__ == "__main__":
     api_key = ""
     pb_rpc = pushbulletrpc.PushbulletRPC(api_key, "cli")
-    print "PushBulletRPC started."
+    print "PushbulletRPC started."
     pb_rpc.register_function(ping)
     pb_rpc.register_function(upper)
     try:
