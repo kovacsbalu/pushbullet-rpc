@@ -1,14 +1,14 @@
 Pushbullet-RPC
 ==============
-Design principle based on python SimpleXMLRPCServer.
-
-Use Pushbullet *note* for calling python functions. The note *title* used as function name and the *body* contains the function parameter when necessary.
-
 .. image:: https://travis-ci.org/kovacsbalu/pushbullet-rpc.svg?branch=master
     :target: https://travis-ci.org/kovacsbalu/pushbullet-rpc 
 
 .. image:: https://coveralls.io/repos/github/kovacsbalu/pushbullet-rpc/badge.svg?branch=master
     :target: https://coveralls.io/github/kovacsbalu/pushbullet-rpc?branch=master
+
+Design principle based on python SimpleXMLRPCServer.
+
+Use Pushbullet *note* for calling python functions. The note *title* used as function name and the *body* contains the function parameter when necessary.
 
 Installation
 ------------
